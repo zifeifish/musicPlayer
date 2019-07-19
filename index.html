@@ -18,7 +18,7 @@
   <div id="player">
     <h2 class="title">黑云音乐</h2>
     <div class="search">
-      <input type="text" />
+      <input type="text" v-model.trim='songName' @keyup.13='searchSong()' />
       <button>
         <span class="iconfont icon-search"></span>
       </button>
@@ -30,18 +30,6 @@
         <router-link to='/player' class="bar-item" active-class='active'>歌曲播放</router-link>
         <router-link to='/video' class="bar-item" active-class='active'>mv</router-link>
         <router-link to='/comment' class="bar-item" active-class='active'>歌曲评论</router-link>
-        <!-- <a class="bar-item active">
-          搜索结果
-        </a>
-        <a class="bar-item">
-          歌曲播放
-        </a>
-        <a class="bar-item">
-          mv
-        </a>
-        <a class="bar-item">
-          歌曲评论>
-        </a> -->
 
       </div>
       <!-- 对应的内容区域 -->
@@ -56,38 +44,19 @@
 
 <script src="./lib/vue.js"></script>
 <script src="./lib/vue-router.js"></script>
+<script src="./lib/axios.js"></script>
 
 <!-- 准备搜索结果模板 -->
 <script id="tmp_result" type="text/html">
   <div class="result-wrapper">
-    <div class="song">
+    <div class="song" v-for='(item,index) in songList'>
       <div class="name">
         <span class="iconfont icon-play"></span>
-        美丽的神话
+        {{item.name}}
         <span class="iconfont icon-editmedia"></span>
       </div>
       <div class="singer">韩红|孙楠</div>
-      <div class="album">《美丽的神话》</div>
-      <div class="time">04:30</div>
-    </div>
-    <div class="song">
-      <div class="name">
-        <span class="iconfont icon-play"></span>
-        美丽的神话
-        <span class="iconfont icon-editmedia"></span>
-      </div>
-      <div class="singer">韩红|孙楠</div>
-      <div class="album">《美丽的神话》</div>
-      <div class="time">04:30</div>
-    </div>
-    <div class="song">
-      <div class="name">
-        <span class="iconfont icon-play"></span>
-        美丽的神话
-        <span class="iconfont icon-editmedia"></span>
-      </div>
-      <div class="singer">韩红|孙楠</div>
-      <div class="album">《美丽的神话》</div>
+      <div class="album">《{{ item.album.name }}》</div>
       <div class="time">04:30</div>
     </div>
   </div>
@@ -187,7 +156,28 @@
 <script>
   // 准备搜索结果组件
   const Result = {
-    template: '#tmp_result'
+    template: '#tmp_result',
+    data: function () {
+      return {
+        songList:[]
+      }
+    },
+    created() {
+      // 获取传递过来的 歌曲名
+      const sogName = this.$route.params.songName;
+      // 根据歌曲名发送ajax 获取搜索结果
+      // 用axios库 发送ajax请求 搜索歌曲
+      axios.get(`https://autumnfish.cn/search?keywords=${sogName}`)
+        .then((backData) => {
+          console.log(backData);
+          // 获取搜索歌单
+          this.songList = backData.data.result.songs;
+        });
+
+    },
+    methods: {
+
+    },
   };
 
   // 准备歌曲播放组件
@@ -205,7 +195,7 @@
 
   // 设置路由配置规制
   const routes = [
-    { path: '/result', component: Result },
+    { path: '/result/:songName', component: Result },
     { path: '/player', component: Player },
     { path: '/video', component: Video },
     { path: '/comment', component: Commemt },
@@ -219,7 +209,16 @@
   // 实例化vue对象 管理路由
   new Vue({
     el: '#player',
-    router
+    router,
+    data: {
+      songName: ''
+    },
+    methods: {
+      // 导航到搜索结果  并将搜索歌曲 传递过去
+      searchSong() {
+        router.push(`/result/${this.songName}`);
+      }
+    },
   });
 
 
