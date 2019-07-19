@@ -19,7 +19,7 @@
     <h2 class="title">黑云音乐</h2>
     <div class="search">
       <input type="text" v-model.trim='songName' @keyup.13='searchSong()' />
-      <button>
+      <button @click='searchSong()'>
         <span class="iconfont icon-search"></span>
       </button>
     </div>
@@ -55,9 +55,9 @@
         {{item.name}}
         <span class="iconfont icon-editmedia"></span>
       </div>
-      <div class="singer">韩红|孙楠</div>
+      <div class="singer">{{ item.artists | formatSinger }}</div>
       <div class="album">《{{ item.album.name }}》</div>
-      <div class="time">04:30</div>
+      <div class="time">{{item.duration | formatTime}}</div>
     </div>
   </div>
   
@@ -159,10 +159,11 @@
     template: '#tmp_result',
     data: function () {
       return {
-        songList:[]
+        songList: []
       }
     },
     created() {
+      this.songList = [];
       // 获取传递过来的 歌曲名
       const sogName = this.$route.params.songName;
       // 根据歌曲名发送ajax 获取搜索结果
@@ -174,6 +175,30 @@
           this.songList = backData.data.result.songs;
         });
 
+    },
+    // 过滤器
+    filters: {
+      formatSinger(arr) {
+        let str = '';
+        for (var i = 0; i < arr.length; i++) {
+          str += arr[i].name + '|';
+        }
+        str = str.substr(0, str.length - 1);
+        return str;
+      },
+      formatTime(value) {
+        let s = '';
+        // 总秒
+        s = Math.round(value / 1000);
+        // 分
+        let m = parseInt(s / 60);
+        // 分后面的秒
+        s = (s % 60);
+        // 如果秒小于10 前面加0
+        s = s < 10 ? '0' + s : s;
+        return m + ':' + s;
+
+      }
     },
     methods: {
 
@@ -211,7 +236,7 @@
     el: '#player',
     router,
     data: {
-      songName: ''
+      songName: '美丽的神话'
     },
     methods: {
       // 导航到搜索结果  并将搜索歌曲 传递过去
