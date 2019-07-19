@@ -1,44 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
-    <link rel="stylesheet" href="./css/index.css" />
-    <link rel="stylesheet" href="./css/iconfont.css" />
-  </head>
-  <body>
-    <div id="player">
-      <h2 class="title">黑云音乐</h2>
-      <div class="search">
-        <input type="text"/>
-        <button>
-          <span class="iconfont icon-search"></span>
-        </button>
-      </div>
-      <div class="tab-wrapper">
-        <!-- tab栏 -->
-        <div class="tab-bar">
-          <a class="bar-item active">
-            搜索结果
-          </a>
-          <a class="bar-item">
-            歌曲播放
-          </a>
-          <a class="bar-item">
-            mv
-          </a>
-          <a class="bar-item">
-            歌曲评论>
-          </a>
-         
-        </div>
-        <!-- 对应的内容区域 -->
-        <div class="tab-content">
 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/index.css" />
+  <link rel="stylesheet" href="./css/iconfont.css" />
+  <link rel="stylesheet" href="./css/results.css" />
+  <link rel="stylesheet" href="./css/player.css">
+  <link rel="stylesheet" href="./css/video.css">
+  <link rel="stylesheet" href="./css/comment.css">
+</head>
+
+<body>
+  <div id="player">
+    <h2 class="title">黑云音乐</h2>
+    <div class="search">
+      <input type="text" />
+      <button>
+        <span class="iconfont icon-search"></span>
+      </button>
+    </div>
+    <div class="tab-wrapper">
+      <!-- tab栏 -->
+      <div class="tab-bar">
+        <router-link to='/result' class="bar-item" active-class='active'>搜索结果</router-link>
+        <router-link to='/player' class="bar-item" active-class='active'>歌曲播放</router-link>
+        <router-link to='/video' class="bar-item" active-class='active'>mv</router-link>
+        <router-link to='/comment' class="bar-item" active-class='active'>歌曲评论</router-link>
+        <!-- <a class="bar-item active">
+          搜索结果
+        </a>
+        <a class="bar-item">
+          歌曲播放
+        </a>
+        <a class="bar-item">
+          mv
+        </a>
+        <a class="bar-item">
+          歌曲评论>
+        </a> -->
+
+      </div>
+      <!-- 对应的内容区域 -->
+      <div class="tab-content">
+        <router-view></router-view>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+
+<script src="./lib/vue.js"></script>
+<script src="./lib/vue-router.js"></script>
+
+<!-- 准备搜索结果模板 -->
+<script id="tmp_result" type="text/html">
+  <div class="result-wrapper">
+    <div class="song">
+      <div class="name">
+        <span class="iconfont icon-play"></span>
+        美丽的神话
+        <span class="iconfont icon-editmedia"></span>
+      </div>
+      <div class="singer">韩红|孙楠</div>
+      <div class="album">《美丽的神话》</div>
+      <div class="time">04:30</div>
+    </div>
+    <div class="song">
+      <div class="name">
+        <span class="iconfont icon-play"></span>
+        美丽的神话
+        <span class="iconfont icon-editmedia"></span>
+      </div>
+      <div class="singer">韩红|孙楠</div>
+      <div class="album">《美丽的神话》</div>
+      <div class="time">04:30</div>
+    </div>
+    <div class="song">
+      <div class="name">
+        <span class="iconfont icon-play"></span>
+        美丽的神话
+        <span class="iconfont icon-editmedia"></span>
+      </div>
+      <div class="singer">韩红|孙楠</div>
+      <div class="album">《美丽的神话》</div>
+      <div class="time">04:30</div>
+    </div>
+  </div>
+  
+</script>
+<!-- 歌曲播放模板 -->
+<script id="tmp_player" type="text/html">
+  <div class="player">
+    <div class="left">
+      <img class='disc' src="./img/disc.png" alt="">
+      <img class='cover' src="./img/cover.png" alt="">
+    </div>
+    <div class="right">
+      <div class="title"><img src="./img/tag.png" alt=""><span>放个大招给你看</span> </div>
+      <div class="singer">歌手: <span>尼古拉斯赵四</span></div>
+      <div class="album">所属专辑: <span>我就是我</span></div>
+      <audio class='audio' controls src=""></audio>
+      <ul class='lyric-container'>
+        <li class='lyric'>难以忘记</li>
+        <li class='lyric'>初次见你</li>
+        <li class='lyric'>那双迷人的小眼睛</li>
+      </ul>
+    </div>
+  </div>
+</script>
+<!-- MV模板 -->
+<script id="tmp_video" type="text/html">
+  <div class="video">
+    <div class="title-wrapper">
+      <span class='tag'>MV</span>
+      <span class='title'>冲动的惩罚</span>
+      <span class='artist'>刀郎</span>
+    </div>
+    <video src="" controls></video>
+  </div>
+</script>
+<!-- 评论模板 -->
+<script id="tmp_comment" type="text/html">
+  <div class="comment-wrapper">
+    <div class="items">
+      <div class="item">
+        <div class="left">
+          <img src="./img/icon.jpg" alt="">
+        </div>
+        <div class="right">
+          <div class="top">
+            <span class='user'>阿木木:</span>
+            <span class='content'>写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心</span>
+          </div>
+          <div class="bottom">
+            <div class="time">2016年9月18日</div>
+            <div class="like-wrapper">
+                <span>👍</span>(6666)
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="left">
+          <img src="./img/icon.jpg" alt="">
+        </div>
+        <div class="right">
+          <div class="top">
+            <span class='user'>阿木木:</span>
+            <span class='content'>写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心</span>
+          </div>
+          <div class="bottom">
+            <div class="time">2016年9月18日</div>
+            <div class="like-wrapper">
+                <span>👍</span>(6666)
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="left">
+          <img src="./img/icon.jpg" alt="">
+        </div>
+        <div class="right">
+          <div class="top">
+            <span class='user'>阿木木:</span>
+            <span class='content'>写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心写歌的人假正经，唱歌的人最矫情，听歌的人最用心</span>
+          </div>
+          <div class="bottom">
+            <div class="time">2016年9月18日</div>
+            <div class="like-wrapper">
+                <span>👍</span>(6666)
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</script>
+
+
+<script>
+  // 准备搜索结果组件
+  const Result = {
+    template: '#tmp_result'
+  };
+
+  // 准备歌曲播放组件
+  const Player = {
+    template: '#tmp_player'
+  };
+  // 准备MV组件
+  const Video = {
+    template: '#tmp_video'
+  };
+  // 准备评论组件
+  const Commemt = {
+    template: '#tmp_comment'
+  };
+
+  // 设置路由配置规制
+  const routes = [
+    { path: '/result', component: Result },
+    { path: '/player', component: Player },
+    { path: '/video', component: Video },
+    { path: '/comment', component: Commemt },
+  ];
+
+  // 实例化路由对象 并挂载路由
+  const router = new VueRouter({
+    routes
+  });
+
+  // 实例化vue对象 管理路由
+  new Vue({
+    el: '#player',
+    router
+  });
+
+
+
+</script>
