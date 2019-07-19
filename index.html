@@ -51,7 +51,7 @@
   <div class="result-wrapper">
     <div class="song" v-for='(item,index) in songList'>
       <div class="name">
-        <span class="iconfont icon-play" @click='toPlay(item.id,item.name,item.album.name)'></span>
+        <span class="iconfont icon-play" @click='toPlay(item.id,item.name,item.album.name,item.artists[0].name)'></span>
         {{item.name}}
         <span class="iconfont icon-editmedia" v-show='item.mvid!=0' @click='toMV(item.mvid)'></span>
       </div>
@@ -67,11 +67,11 @@
   <div class="player">
     <div class="left">
       <img class='disc' src="./img/disc.png" alt="">
-      <img class='cover' src="./img/cover.png" alt="">
+      <img class='cover' :src="coverUrl" alt="">
     </div>
     <div class="right">
       <div class="title"><img src="./img/tag.png" alt=""><span>{{songName}}</span> </div>
-      <div class="singer">歌手: <span>子非鱼</span></div>
+      <div class="singer">歌手: <span>{{ artists}}</span></div>
       <div class="album">所属专辑: <span>{{albumName}}</span></div>
       <audio class='audio' controls :src="songUrl" loop autoplay></audio>
       <ul class='lyric-container'>
@@ -204,8 +204,8 @@
         router.push(`/video/${id}`);
       },
       // 点击播放按钮 将歌曲id传递到播放组件
-      toPlay(id,songName,albumName) {
-        router.push(`/player/${id}/${songName}/${albumName}`);
+      toPlay(id, songName, albumName, artists) {
+        router.push(`/player/${id}/${songName}/${albumName}/${artists}`);
       }
     },
   };
@@ -217,7 +217,9 @@
       return {
         songUrl: '',
         songName: '',
-        paramsalbumName:''
+        paramsalbumName: '',
+        artists: '',
+        coverUrl: ''
       }
     },
     created() {
@@ -227,13 +229,17 @@
       this.songName = this.$route.params.songName;
       // 获取专辑名
       this.albumName = this.$route.params.albumName;
-      console.log(id);
-      // 根据歌曲id 发送ajax请求
+      // 根据歌曲id 发送ajax请求 获取歌曲路径
       axios.get(`https://autumnfish.cn/song/url?id=${id}`)
         .then((backData) => {
-          console.log(backData);
           // 获取歌曲路径
           this.songUrl = backData.data.data[0].url;
+        });
+        // 获取封面地址
+      axios.get(`https://autumnfish.cn/song/detail?ids=${id}`)
+        .then((backData) => {
+          console.log('--------------');
+          this.coverUrl = backData.data.songs[0].al.picUrl;
         });
 
     },
@@ -277,7 +283,7 @@
   // 设置路由配置规制
   const routes = [
     { path: '/result/:songName', component: Result },
-    { path: '/player/:id/:songName/:albumName', component: Player },
+    { path: '/player/:id/:songName/:albumName/:artists', component: Player },
     { path: '/video/:id', component: Video },
     { path: '/comment', component: Commemt },
   ];
@@ -298,6 +304,8 @@
       // 导航到搜索结果  并将搜索歌曲 传递过去
       searchSong() {
         router.push(`/result/${this.songName}`);
+        // 解决重新搜索不会立刻加载显示BUG
+        window.location.reload();
       }
     },
   });
