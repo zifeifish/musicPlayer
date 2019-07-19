@@ -87,10 +87,10 @@
   <div class="video">
     <div class="title-wrapper">
       <span class='tag'>MV</span>
-      <span class='title'>冲动的惩罚</span>
-      <span class='artist'>刀郎</span>
+      <span class='title'>{{mvData.name}}</span>
+      <span class='artist'>{{mvData.artists | formatSingerName}}</span>
     </div>
-    <video src="" controls></video>
+    <video :src="mvData.brs[480]?mvData.brs[480]:mvData.brs[240]" controls></video>
   </div>
 </script>
 <!-- 评论模板 -->
@@ -208,27 +208,52 @@
 
   // 准备歌曲播放组件
   const Player = {
-    template: '#tmp_player'
+    template: '#tmp_player',
+    created() {
+      
+    },
   };
   // 准备MV组件
   const Video = {
-    template: '#tmp_video'
+    template: '#tmp_video',
+    data: function () {
+      return {
+        mvData: ''
+      }
+    },
+    created() {
+      console.log(this.$route);
+      const mvid = this.$route.params.id;
+      // 用axios库 发送ajax请求 搜索歌曲mv url地址
+      axios.get(`https://autumnfish.cn/mv/detail?mvid=${mvid}`)
+        .then((backData) => {
+          console.log(backData);
+          // 获取歌曲mv地址
+          this.mvData = backData.data.data;
+        });
+    },
+    filters: {
+      formatSingerName(arr) {
+        let str = '';
+        for (var i = 0; i < arr.length; i++) {
+          str += arr[i].name + '|';
+        }
+        str = str.substr(0, str.length - 1);
+        return str;
+      }
+    },
   };
   // 准备评论组件
   const Commemt = {
     template: '#tmp_comment',
-    created() {
-      console.log(this.$route);
-      console.log(mvid);
-      
-    },
+
   };
 
   // 设置路由配置规制
   const routes = [
     { path: '/result/:songName', component: Result },
     { path: '/player', component: Player },
-    { path: '/video/:mvid', component: Video },
+    { path: '/video/:id', component: Video },
     { path: '/comment', component: Commemt },
   ];
 
