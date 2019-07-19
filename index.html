@@ -53,7 +53,7 @@
       <div class="name">
         <span class="iconfont icon-play"></span>
         {{item.name}}
-        <span class="iconfont icon-editmedia"></span>
+        <span class="iconfont icon-editmedia" v-show='item.mvid!=0'></span>
       </div>
       <div class="singer">{{ item.artists | formatSinger }}</div>
       <div class="album">《{{ item.album.name }}》</div>
