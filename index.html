@@ -51,7 +51,7 @@
   <div class="result-wrapper">
     <div class="song" v-for='(item,index) in songList'>
       <div class="name">
-        <span class="iconfont icon-play" @click='toPlay(item.id,item.name,item.album.name,item.artists[0].name)'></span>
+        <span class="iconfont icon-play" @click='toPlay(item.id,item.name,item.album.name)'></span>
         {{item.name}}
         <span class="iconfont icon-editmedia" v-show='item.mvid!=0' @click='toMV(item.mvid)'></span>
       </div>
@@ -71,13 +71,14 @@
     </div>
     <div class="right">
       <div class="title"><img src="./img/tag.png" alt=""><span>{{songName}}</span> </div>
-      <div class="singer">歌手: <span>{{ artists}}</span></div>
-      <div class="album">所属专辑: <span>{{albumName}}</span></div>
+      <div class="singer">歌手: <span>&nbsp;{{artists | formatSingerName}}</span></div>
+      <div class="album">所属专辑: <span> &nbsp;{{albumName}}</span></div>
       <audio class='audio' controls :src="songUrl" loop autoplay></audio>
       <ul class='lyric-container'>
-        <li class='lyric'>难以忘记</li>
+        <!-- <li class='lyric'>难以忘记</li>
         <li class='lyric'>初次见你</li>
-        <li class='lyric'>那双迷人的小眼睛</li>
+        <li class='lyric'>那双迷人的小眼睛</li> -->
+        <li class='lyric'>{{lyric}}</li>
       </ul>
     </div>
   </div>
@@ -169,7 +170,6 @@
       // 用axios库 发送ajax请求 搜索歌曲
       axios.get(`https://autumnfish.cn/search?keywords=${sogName}`)
         .then((backData) => {
-          console.log(backData);
           // 获取搜索歌单
           this.songList = backData.data.result.songs;
         });
@@ -179,7 +179,7 @@
       formatSinger(arr) {
         let str = '';
         for (var i = 0; i < arr.length; i++) {
-          str += arr[i].name + '|';
+          str += arr[i].name + '/';
         }
         str = str.substr(0, str.length - 1);
         return str;
@@ -204,8 +204,8 @@
         router.push(`/video/${id}`);
       },
       // 点击播放按钮 将歌曲id传递到播放组件
-      toPlay(id, songName, albumName, artists) {
-        router.push(`/player/${id}/${songName}/${albumName}/${artists}`);
+      toPlay(id, songName, albumName) {
+        router.push(`/player/${id}/${songName}/${albumName}`);
       }
     },
   };
@@ -218,8 +218,19 @@
         songUrl: '',
         songName: '',
         paramsalbumName: '',
-        artists: '',
-        coverUrl: ''
+        artists: [],
+        coverUrl: '',
+        lyric: ''
+      }
+    },
+    filters: {
+      formatSingerName(arr) {
+        let str = '';
+        for (var i = 0; i < arr.length; i++) {
+          str += arr[i].name + '/';
+        }
+        str = str.substr(0, str.length - 1);
+        return str;
       }
     },
     created() {
@@ -229,18 +240,32 @@
       this.songName = this.$route.params.songName;
       // 获取专辑名
       this.albumName = this.$route.params.albumName;
+      // 获取歌曲作者
+      this.artists = this.$route.params.artists;
       // 根据歌曲id 发送ajax请求 获取歌曲路径
       axios.get(`https://autumnfish.cn/song/url?id=${id}`)
         .then((backData) => {
           // 获取歌曲路径
           this.songUrl = backData.data.data[0].url;
         });
-        // 获取封面地址
+      // 获取封面地址
       axios.get(`https://autumnfish.cn/song/detail?ids=${id}`)
         .then((backData) => {
-          console.log('--------------');
+
+          console.log(backData);
+          // 封面图片地址
           this.coverUrl = backData.data.songs[0].al.picUrl;
+          // 歌手名数组
+          this.artists = backData.data.songs[0].ar;
         });
+      // 获取歌词
+      axios.get(`https://autumnfish.cn/lyric?id=${id}`)
+        .then((backData) => {
+          console.log('---------------');
+          console.log(backData);
+          this.lyric = backData.data.lrc.lyric;
+        });
+
 
     },
   };
@@ -267,7 +292,7 @@
       formatSingerName(arr) {
         let str = '';
         for (var i = 0; i < arr.length; i++) {
-          str += arr[i].name + '|';
+          str += arr[i].name + '/';
         }
         str = str.substr(0, str.length - 1);
         return str;
@@ -283,7 +308,7 @@
   // 设置路由配置规制
   const routes = [
     { path: '/result/:songName', component: Result },
-    { path: '/player/:id/:songName/:albumName/:artists', component: Player },
+    { path: '/player/:id/:songName/:albumName', component: Player },
     { path: '/video/:id', component: Video },
     { path: '/comment', component: Commemt },
   ];
@@ -298,7 +323,7 @@
     el: '#player',
     router,
     data: {
-      songName: ''
+      songName: '残酷月光'
     },
     methods: {
       // 导航到搜索结果  并将搜索歌曲 传递过去
